@@ -42,7 +42,7 @@ setup(
     },
 
     # 包含的包，使用find_packages()自动发现所有包和子包
-    packages=find_packages(),
+    packages=['models'],
 
     # 包中包含的Python脚本
     scripts=[],
