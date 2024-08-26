@@ -1,10 +1,10 @@
 # setup.py
-from setuptools import setup, find_packages
+from setuptools import setup,find_packages
 
 setup(
     # 包名，应与你的包目录名称一致
-    name='EasyRpa-Common',
-    version='0.1.0',
+    name='easyrpa',
+    version='0.1.1',
     author='monkeygeek',
     author_email='monkeygeek@qq.com',
     description='easy rpa common tools project',
@@ -42,7 +42,7 @@ setup(
     },
 
     # 包含的包，使用find_packages()自动发现所有包和子包
-    packages=['models'],
+    packages=find_packages(include=['easyrpa','easyrpa.enums', 'easyrpa.models', 'easyrpa.tools']),
 
     # 包中包含的Python脚本
     scripts=[],

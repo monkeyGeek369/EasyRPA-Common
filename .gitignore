@@ -1,7 +1,7 @@
 *.log
 *.srt
 
-EasyRpa_Common.egg-info/*
+easyrpa.egg-info/*
 dev
 venv
 dist
