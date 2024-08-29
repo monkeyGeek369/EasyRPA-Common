@@ -42,7 +42,7 @@ setup(
     },
 
     # 包含的包，使用find_packages()自动发现所有包和子包
-    packages=['easyrpa','easyrpa.enums', 'easyrpa.models', 'easyrpa.tools'],
+    packages=['easyrpa','easyrpa.enums', 'easyrpa.models', 'easyrpa.tools','easyrpa.script_exe'],
 
     # 包中包含的Python脚本
     scripts=[],

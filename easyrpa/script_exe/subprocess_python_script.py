@@ -1,6 +1,4 @@
 import subprocess
-import ast
-from typing import List
 from tools import str_tools
 from models.easy_rpa_exception import EasyRpaException
 from models.scripty_exe_result import ScriptExeResult
@@ -44,37 +42,37 @@ def subprocess_script_run(env_activate_command:str, python_interpreter:str, scri
         # 获取标准输出流
         print_list = result.stdout.readlines
 
-        if not print_list or len(print_list):
-            return ScriptExeResult(False,"")
-
-        return ScriptExeResult
+        # 执行结果返回
+        if not print_list or len(print_list) < 0:
+            return ScriptExeResult(False,"script exe result is empty",None,None)
+        else:
+            return ScriptExeResult(True,"script exe success",print_list[:-1],print_list[-1])
     except subprocess.CalledProcessError as e:
-        # 打印错误信息
-        print(f"An error occurred: {e}")
-        return None
-
-def prints_to_result(prints:str)
+        return ScriptExeResult(False,e.output,None,None)
 
 
-# 使用示例
-if __name__ == "__main__":
-    # Conda环境名称
-    conda_env_name = 'playwright'
-    
+def test_subprocess_script():
+    # 环境激活指令
+    env_activate_command = 'conda activate playwright'
+        
     # 指定Python解释器名称，这里使用conda环境中的python
     python_interpreter = 'python3'
-    
+        
     # 外部Python脚本的文件路径
-    script_path = 'test.py'
-    
+    script_path = 'test_script.py'
+        
     # 传递给外部脚本的参数列表
-    #params = '{\"key1\":\"value1\",\"key2\":True,\"key3\":{\"key31\":123}}' # 替换为实际参数
+    #params = '{\"key1\":\"value1\",\"key2\":True,\"key3\":{\"key31\":123}}'
     params = {"key1":"value1","key2":True,"key3":{"key31":123}}
 
     # 执行脚本并获取结果
-    execution_result = run_external_python_script(conda_env_name, python_interpreter, script_path, params)
-    
+    execution_result = subprocess_script_run(env_activate_command, python_interpreter, script_path, params)
+        
     # 打印执行结果
     if execution_result is not None:
-        python_dict = ast.literal_eval(execution_result)
-        print("Execution result:", execution_result)
+        print("执行结果:", execution_result)
+
+#unittest.main()作为主函数入口
+if __name__ == '__main__':
+    test_subprocess_script()
+
