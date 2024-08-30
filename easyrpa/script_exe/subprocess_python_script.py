@@ -1,8 +1,8 @@
 import subprocess
-from tools import str_tools
-from models.easy_rpa_exception import EasyRpaException
-from models.scripty_exe_result import ScriptExeResult
-from enums.easy_rpa_exception_code_enum import EasyRpaExceptionCodeEnum
+from easyrpa.tools import str_tools
+from easyrpa.models.easy_rpa_exception import EasyRpaException
+from easyrpa.models.scripty_exe_result import ScriptExeResult
+from easyrpa.enums.easy_rpa_exception_code_enum import EasyRpaExceptionCodeEnum
 
 def subprocess_script_run(env_activate_command:str, python_interpreter:str, script_path:str, dict_args:dict):
     """

@@ -1,5 +1,5 @@
 import unittest
-#from easyrpa.script_exe import subprocess_python_script
+from easyrpa.script_exe import subprocess_python_script
 
 class SubprocessScriptTest(unittest.TestCase):
 
