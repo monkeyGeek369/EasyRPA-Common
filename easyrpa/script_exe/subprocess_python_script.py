@@ -22,7 +22,7 @@ def subprocess_script_run(env_activate_command:str, python_interpreter:str, scri
         raise EasyRpaException("python_interpreter is empty",EasyRpaExceptionCodeEnum.DATA_NULL,None,dict_args)
     if str_tools.str_is_empty(script_path):
         raise EasyRpaException("script_path is empty",EasyRpaExceptionCodeEnum.DATA_NULL,None,dict_args)
-    if not dict_args or len(dict_args):
+    if not dict_args or len(dict_args) <= 0:
         raise EasyRpaException("dict_args is empty",EasyRpaExceptionCodeEnum.DATA_NULL,None,script_path)
 
     # 构建conda激活命令和Python脚本执行命令
@@ -32,47 +32,24 @@ def subprocess_script_run(env_activate_command:str, python_interpreter:str, scri
         # 使用subprocess.run执行命令，捕获输出
         result = subprocess.Popen(
             command,
-            env= dict_args, # 将外部脚本参数当作子流程变量传递,避免并发问题
+            env= dict_args, # 将外部脚本参数当作子流程变量传递,避免并发问题.注意字典的key和value必须是str,否则会有类型错误
+            stdout=subprocess.PIPE,  # 创建一个管道来捕获输出
+            stderr=subprocess.PIPE,  # 创建一个管道来捕获错误
             shell=True,        # 需要开启shell以执行conda激活命令
-            capture_output=True,  # 捕获输出
-            text=True,           # 输出为文本格式,否则为字节方式输出
-            check=True           # 将非零返回码视为异常
+            universal_newlines=True           # 输出为文本格式,否则为字节方式输出
         )
         
         # 获取标准输出流
-        print_list = result.stdout.readlines
+        stdout, stderr = result.communicate()
+
+        # todo mahao
+
+        print_list = stdout.readlines
 
         # 执行结果返回
         if not print_list or len(print_list) < 0:
             return ScriptExeResult(False,"script exe result is empty",None,None)
         else:
             return ScriptExeResult(True,"script exe success",print_list[:-1],print_list[-1])
-    except subprocess.CalledProcessError as e:
+    except Exception as e:
         return ScriptExeResult(False,e.output,None,None)
-
-
-def test_subprocess_script():
-    # 环境激活指令
-    env_activate_command = 'conda activate playwright'
-        
-    # 指定Python解释器名称，这里使用conda环境中的python
-    python_interpreter = 'python3'
-        
-    # 外部Python脚本的文件路径
-    script_path = 'test_script.py'
-        
-    # 传递给外部脚本的参数列表
-    #params = '{\"key1\":\"value1\",\"key2\":True,\"key3\":{\"key31\":123}}'
-    params = {"key1":"value1","key2":True,"key3":{"key31":123}}
-
-    # 执行脚本并获取结果
-    execution_result = subprocess_script_run(env_activate_command, python_interpreter, script_path, params)
-        
-    # 打印执行结果
-    if execution_result is not None:
-        print("执行结果:", execution_result)
-
-#unittest.main()作为主函数入口
-if __name__ == '__main__':
-    test_subprocess_script()
-
