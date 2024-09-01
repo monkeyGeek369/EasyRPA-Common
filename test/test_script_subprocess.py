@@ -36,7 +36,7 @@ print_json({"message": "78\\n9"})
             """
         
         # 传递给外部脚本的参数列表
-        params = {"key1":"value1","key2":"value2","key3":123}
+        params = {"key1":"value1","key2":"value2","key3":"123"}
 
         # 执行脚本并获取结果
         execution_result = subprocess_python_script.subprocess_script_run(env_activate_command, python_interpreter,script, params)
