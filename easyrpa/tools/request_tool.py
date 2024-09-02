@@ -1,5 +1,7 @@
 from easyrpa.models.base.request_header import RequestHeader
 from easyrpa.tools import thread_local
+import uuid
+from datetime import datetime
 
 # 从请求中获取指定内容
 def get_parameter(request, param, default, cast_type):
@@ -21,7 +23,7 @@ def get_current_header() -> RequestHeader:
     """
     header = thread_local.get_thread_local_data().get_data("header")
     if not header:
-        result_header = RequestHeader(user_id=1)
+        result_header = RequestHeader(user_id=1,trace_id=uuid.uuid4(),req_time=datetime.now())
         thread_local.get_thread_local_data().set_data("header",result_header)
     
     return thread_local.get_thread_local_data().get_data("header")
