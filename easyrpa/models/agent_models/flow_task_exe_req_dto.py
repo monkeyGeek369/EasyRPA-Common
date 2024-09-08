@@ -5,7 +5,7 @@ class FlowTaskExeReqDTO:
                  ,flow_id:int,flow_code:str,flow_name:str,flow_rpa_type:int
                  ,flow_exe_env:str
                  ,flow_standard_message:str
-                 ,flow_exe_script:str):
+                 ,flow_exe_script:str,sub_source:int):
         self.task_id = task_id
         self.site_id = site_id
         self.flow_id = flow_id
@@ -15,3 +15,4 @@ class FlowTaskExeReqDTO:
         self.flow_exe_env = flow_exe_env
         self.flow_standard_message = flow_standard_message
         self.flow_exe_script = flow_exe_script
+        self.sub_source = sub_source

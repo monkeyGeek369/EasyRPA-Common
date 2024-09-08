@@ -5,6 +5,8 @@ from easyrpa.models.scripty_exe_result import ScriptExeResult
 from easyrpa.enums.easy_rpa_exception_code_enum import EasyRpaExceptionCodeEnum
 import os
 import tempfile
+from easyrpa.models.base.script_exe_param_model import ScriptExeParamModel
+import platform
 
 def subprocess_script_run(env_activate_command:str, python_interpreter:str 
                           ,script:str,dict_args:dict):
@@ -78,3 +80,48 @@ def subprocess_script_run(env_activate_command:str, python_interpreter:str
     finally:
         # 删除临时文件
         os.remove(filename)
+
+def script_exe_param_builder(param:ScriptExeParamModel) -> dict:
+    """
+    将ScriptExeParamModel转换为dict
+
+    Args:
+        param (ScriptExeParamModel): 请求参数
+
+    Returns:
+        dict: str dict
+    """
+    if not param:
+        return None
+    
+    # 将类对象转换为json字符串
+    json_str = param.to_json()
+
+    # 将json字符串转换为dict
+    dict_param = str_tools.str_to_str_dict(json_str)
+
+    return dict_param
+
+def env_activate_command_builder(flow_exe_env:str) -> str:
+    """
+    构建conda激活命令
+
+    Args:
+        env_activate_command (str): 环境激活指令
+
+    Returns:
+        str: conda激活命令
+    """
+    
+    env_activate_command = None
+    if platform.system() == "Windows":
+        env_activate_command = f'conda activate {flow_exe_env}'
+    elif platform.system() == "Darwin":
+        env_activate_command = f'source activate {flow_exe_env}'
+    elif platform.system() == "Linux":
+        env_activate_command = f'source activate {flow_exe_env}'
+    else:
+        raise EasyRpaException("operation sysytem is not support",EasyRpaExceptionCodeEnum.SYSTEM_NOT_FOUND,None,flow_exe_env)
+
+    return env_activate_command
+    

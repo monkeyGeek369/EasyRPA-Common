@@ -1,3 +1,7 @@
+import json
+from easyrpa.models.easy_rpa_exception import EasyRpaException
+from easyrpa.enums.easy_rpa_exception_code_enum import EasyRpaExceptionCodeEnum
+
 
 def str_is_empty(str):
     """str_is_empty judge str is empty
@@ -57,3 +61,18 @@ def dict_key_value_is_not_all_str(dic_item:dict):
         bool: is not all str
     """
     return not dict_key_value_is_all_str(dic_item)
+
+def str_to_str_dict(param:str) -> dict:
+    if not param:
+        return None
+    
+    json_obj = None
+    try:
+        json_obj = json.loads(param)
+    except:
+        raise EasyRpaException("param is not json type",EasyRpaExceptionCodeEnum.DATA_TYPE_ERROR,None,param)
+    
+    for key, value in json_obj.items():
+        json_obj[key] = str(value)
+
+    return json_obj
