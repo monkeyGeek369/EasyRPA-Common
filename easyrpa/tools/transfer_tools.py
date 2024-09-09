@@ -17,9 +17,7 @@ def any_to_str_dict(param:any) -> dict:
         # 将str转换为dict类型
         dict_param = str_to_str_dict(param)
         
-        # 将json_obj转换为str dict
-        dict_str = dict_to_str_dict(dict_param)
-        return dict_str
+        return dict_param
     elif isinstance(param, object):
         # 将object转换为json字符串
         json_str = param.to_json()

@@ -1,8 +1,8 @@
-from dataclasses import dataclasses
+from dataclasses import dataclass
 from easyrpa.models.base.request_header import RequestHeader
 
 
-@dataclasses.dataclass
+@dataclass
 class ScriptExeParamModel:
     """外部脚本执行参数模型
 
@@ -15,3 +15,4 @@ class ScriptExeParamModel:
     header: RequestHeader
     source: int
     standard: dict
+    flow_config:dict

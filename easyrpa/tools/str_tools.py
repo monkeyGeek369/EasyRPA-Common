@@ -72,7 +72,37 @@ def str_to_str_dict(param:str) -> dict:
     except:
         raise EasyRpaException("param is not json type",EasyRpaExceptionCodeEnum.DATA_TYPE_ERROR,None,param)
     
-    for key, value in json_obj.items():
-        json_obj[key] = str(value)
+    if isinstance(json_obj, list):
+        # 遍历json数组
+        list_tmp = []
+        for item in json_obj:
+            json_item = str_to_str_dict(json.dumps(item))
+            list_tmp.append(json_item)
+        json_obj = list_tmp
+    elif isinstance(json_obj,dict):
+        # 便利json对象
+        for key, value in json_obj.items():
+            # 如果是字符串类型则无需处理
+            if isinstance(value, str):
+                continue
+
+            # 如果是json对象则需要再次便利内部对象进行转换
+            if isinstance(value, dict):
+                json_obj[key] = str_to_str_dict(json.dumps(value))
+                continue
+
+            # 如果是json数组则需要再次便利内部对象进行转换
+            if isinstance(value, list):
+                list_tmp = []
+                for item in value:
+                    json_item = str_to_str_dict(json.dumps(item))
+                    list_tmp.append(json_item)
+                json_obj[key] = list_tmp
+                continue
+
+            # 其它类型默认转换（布尔类型、None类型、数字类型）
+            json_obj[key] = str(value)
+    else:
+        json_obj = str(json_obj)
 
     return json_obj
