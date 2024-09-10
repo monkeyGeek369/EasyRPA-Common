@@ -63,6 +63,17 @@ def dict_key_value_is_not_all_str(dic_item:dict):
     return not dict_key_value_is_all_str(dic_item)
 
 def str_to_str_dict(param:str) -> dict:
+    """将json字符串转换为dict，递归完成对所有层级value值转换为str类型
+
+    Args:
+        param (str): json字符串
+
+    Raises:
+        EasyRpaException: 异常信息
+
+    Returns:
+        dict: 字典结果
+    """
     if not param:
         return None
     
@@ -101,6 +112,43 @@ def str_to_str_dict(param:str) -> dict:
                 continue
 
             # 其它类型默认转换（布尔类型、None类型、数字类型）
+            json_obj[key] = str(value)
+    else:
+        json_obj = str(json_obj)
+
+    return json_obj
+
+def str_to_dict_first_level(param:str) -> dict:
+    """将json字符串转换为dict，只针对第一层级value值转换为str类型
+
+    Args:
+        param (str): json字符串
+
+    Raises:
+        EasyRpaException: 异常信息
+
+    Returns:
+        dict: 字典结果
+    """
+    if not param:
+        return None
+    
+    json_obj = None
+    try:
+        json_obj = json.loads(param)
+    except:
+        raise EasyRpaException("param is not json type",EasyRpaExceptionCodeEnum.DATA_TYPE_ERROR,None,param)
+    
+    if isinstance(json_obj, list):
+        # 遍历json数组
+        list_tmp = []
+        for item in json_obj:
+            json_item = str_to_dict_first_level(json.dumps(item))
+            list_tmp.append(json_item)
+        json_obj = list_tmp
+    elif isinstance(json_obj,dict):
+        # 将所有value转换为str
+        for key, value in json_obj.items():
             json_obj[key] = str(value)
     else:
         json_obj = str(json_obj)

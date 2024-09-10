@@ -23,7 +23,7 @@ def get_current_header() -> RequestHeader:
     """
     header = thread_local.get_thread_local_data().get_data("header")
     if not header:
-        result_header = RequestHeader(user_id=1,trace_id=uuid.uuid4(),req_time=datetime.now())
+        result_header = RequestHeader(user_id=1,trace_id=str(uuid.uuid4()),req_time=datetime.now())
         thread_local.get_thread_local_data().set_data("header",result_header)
     
     return thread_local.get_thread_local_data().get_data("header")
