@@ -3,9 +3,20 @@ from easyrpa.tools import thread_local
 import uuid
 from datetime import datetime
 
-# 从请求中获取指定内容
+# 
 def get_parameter(request, param, default, cast_type):
-    #  先request.args 后request.form 然后转换cast_type=int|float类型。
+    """从请求中获取指定内容(先request.args 后request.form 然后转换cast_type=int|float类型)
+
+    Args:
+        request (_type_): 请求对象
+        param (_type_): 参数
+        default (_type_): 默认值
+        cast_type (_type_): 转换类型
+
+    Returns:
+        _type_: 返回值
+    """
+    #  
     for method in [request.args.get, request.form.get]:
         value = method(param, "").strip()
         if value:
@@ -27,3 +38,11 @@ def get_current_header() -> RequestHeader:
         thread_local.get_thread_local_data().set_data("header",result_header)
     
     return thread_local.get_thread_local_data().get_data("header")
+
+def set_current_header(header:RequestHeader):
+    """设置当前环境header
+
+    Args:
+        header (RequestHeader): header
+    """
+    thread_local.get_thread_local_data().set_data("header",header)
