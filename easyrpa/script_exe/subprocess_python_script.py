@@ -9,7 +9,7 @@ from easyrpa.models.base.script_exe_param_model import ScriptExeParamModel
 import platform
 
 def subprocess_script_run(env_activate_command:str, python_interpreter:str 
-                          ,script:str,dict_args:dict):
+                          ,script:str,dict_args:dict) -> ScriptExeResult:
     """
     激活环境后,使用指定的Python解释器执行外部Python脚本,并传递参数。
 
