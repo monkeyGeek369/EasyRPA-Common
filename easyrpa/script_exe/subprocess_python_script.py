@@ -3,6 +3,7 @@ from easyrpa.tools import str_tools
 from easyrpa.models.easy_rpa_exception import EasyRpaException
 from easyrpa.models.scripty_exe_result import ScriptExeResult
 from easyrpa.enums.easy_rpa_exception_code_enum import EasyRpaExceptionCodeEnum
+from easyrpa.enums.rpa_exe_result_code_enum import RpaExeResultCodeEnum
 import os
 import tempfile
 from easyrpa.models.base.script_exe_param_model import ScriptExeParamModel
@@ -59,7 +60,7 @@ def subprocess_script_run(env_activate_command:str, python_interpreter:str
         
         # 获取失败信息
         if result.stderr and str_tools.str_is_not_empty(result.stderr):
-            return ScriptExeResult(False,"script exe error:" + result.stderr,None,None)
+            return ScriptExeResult(False,"script exe error:" + result.stderr,None,None,RpaExeResultCodeEnum.FLOW_EXE_ERROR.value[1])
 
         # 获取标准输出流
         print_list = None
@@ -68,15 +69,15 @@ def subprocess_script_run(env_activate_command:str, python_interpreter:str
         
         # 执行结果返回
         if not print_list or len(print_list) < 0:
-            return ScriptExeResult(False,"script exe result is empty",None,None)
+            return ScriptExeResult(False,"script exe result is empty",None,None,RpaExeResultCodeEnum.FLOW_EXE_DATA_ERROR.value[1])
         else:
-            return ScriptExeResult(True,"script exe success",print_list[:-1],print_list[-1])
+            return ScriptExeResult(True,"script exe success",print_list[:-1],print_list[-1],RpaExeResultCodeEnum.SUCCESS.value[1])
     except subprocess.CalledProcessError as cpe:
-        return ScriptExeResult(False,cpe.stderr,None,None)
+        return ScriptExeResult(False,cpe.stderr,None,None,RpaExeResultCodeEnum.SYSTEM_OPT_ERROR.value[1])
     except EasyRpaException as easye:
-        return ScriptExeResult(False,str(easye),None,None)
+        return ScriptExeResult(False,str(easye),None,None,RpaExeResultCodeEnum.FLOW_EXE_ERROR.value[1])
     except Exception as e:
-        return ScriptExeResult(False,str(e),None,None)
+        return ScriptExeResult(False,str(e),None,None,RpaExeResultCodeEnum.FLOW_EXE_ERROR.value[1])
     finally:
         # 删除临时文件
         os.remove(filename)

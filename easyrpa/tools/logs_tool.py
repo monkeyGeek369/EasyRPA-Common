@@ -12,6 +12,7 @@ if not os.path.exists(log_dir):
 db_log_file = os.path.join(log_dir, "db.log")
 business_log_file = os.path.join(log_dir, "business.log")
 script_log_file = os.path.join(log_dir, "script.log")
+api_log_file = os.path.join(log_dir, "api.log")
 
 # 定义日志的格式为 JSON
 class JsonFormatter(logging.Formatter):
@@ -57,6 +58,7 @@ def setup_logger(name, log_file, level=logging.INFO):
 db_logger = setup_logger('db_logger', db_log_file)
 business_logger = setup_logger('business_logger', business_log_file)
 script_logger = setup_logger('script_logger', script_log_file)
+api_logger = setup_logger('api_logger', api_log_file)
 
 # 基础日志记录函数
 def log_message(logger, level, log_type, title, message, data=None, exc_info=None):
@@ -92,6 +94,13 @@ def log_script_warn(title, message, data=None, exc_info=None):
 
 def log_script_error(title, message, data=None, exc_info=None):
     script_logger.log(logging.ERROR, message, extra={'log_type': 'Script', 'title': title, 'data': data}, exc_info=exc_info)
+
+# 接口日志
+def log_api_info(title, message, data=None):
+    api_logger.log(logging.INFO, message, extra={'log_type': 'Api', 'title': title, 'data': data}, exc_info=None)
+
+def log_api_error(title, message, data=None, exc_info=None):
+    api_logger.log(logging.ERROR, message, extra={'log_type': 'Api', 'title': title, 'data': data}, exc_info=exc_info)
 
 
 # 使用日志记录器
