@@ -1,3 +1,4 @@
+from operator import truediv
 import subprocess
 from easyrpa.tools import str_tools
 from easyrpa.models.easy_rpa_exception import EasyRpaException
@@ -22,7 +23,7 @@ def subprocess_script_run(env_activate_command:str, python_interpreter:str
     """
 
     # 创建一个临时文件
-    with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.py') as tmpfile:
+    with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.py',encoding='utf-8') as tmpfile:
         filename = tmpfile.name
         tmpfile.write(script)
         tmpfile.flush()  # 确保内容写入文件
@@ -59,17 +60,17 @@ def subprocess_script_run(env_activate_command:str, python_interpreter:str
         )
         
         # 获取失败信息
-        if result.stderr and str_tools.str_is_not_empty(result.stderr):
+        if result.stderr is not None and str_tools.str_is_not_empty(result.stderr):
             return ScriptExeResult(False,"script exe error:" + result.stderr,None,None,RpaExeResultCodeEnum.FLOW_EXE_ERROR.value[1])
 
         # 获取标准输出流
         print_list = None
-        if result.stdout and str_tools.str_is_not_empty(result.stdout):   
+        if result.stdout is not None and str_tools.str_is_not_empty(result.stdout):   
             print_list = result.stdout.splitlines(keepends=False)
         
         # 执行结果返回
-        if not print_list or len(print_list) < 0:
-            return ScriptExeResult(False,"script exe result is empty",None,None,RpaExeResultCodeEnum.FLOW_EXE_DATA_ERROR.value[1])
+        if print_list is None or len(print_list) < 0:
+            return ScriptExeResult(True,"script exe result is empty",print_list,None,RpaExeResultCodeEnum.FLOW_EXE_DATA_ERROR.value[1])
         else:
             return ScriptExeResult(True,"script exe success",print_list[:-1],print_list[-1],RpaExeResultCodeEnum.SUCCESS.value[1])
     except subprocess.CalledProcessError as cpe:
