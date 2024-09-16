@@ -2,11 +2,14 @@ from easyrpa.models.base.request_header import RequestHeader
 from easyrpa.tools import thread_local
 import uuid
 from datetime import datetime
-import functools
+import functools,jsonpickle
 from easyrpa.tools import logs_tool
 from flask import request,jsonify
 from easyrpa.enums.http_response_code_enum import HttpResponseCode
 from easyrpa.models.base.response_base_model import ResponseBaseModel
+from easyrpa.models.base.request_base_model import RequestBaseModel
+from easyrpa.models.easy_rpa_exception import EasyRpaException
+from easyrpa.enums.easy_rpa_exception_code_enum import EasyRpaExceptionCodeEnum
 
 # 
 def get_parameter(request, param, default, cast_type):
@@ -68,30 +71,54 @@ def easyrpa_request_wrapper(func):
     def wrapper(*args, **kwargs):
         try:
             # 记录请求内容
-            logs_tool.log_api_info(title="request_data_record",message=func.__name__,data=request.data)
+            logs_tool.log_api_info(title="request_data_record",message=func.__name__,data=request.get_json())
+
+            # 获取请求header
+            req_model = get_request_base_model(request.get_json())
+            req_header = req_model.header
+            if req_header is None:
+                raise EasyRpaException("request header is null",EasyRpaExceptionCodeEnum.DATA_NULL.value[1],None,req_model)
+
+            # 设置header
+            set_current_header(req_header)
             
             # 调用原始视图函数
-            response = func(*args, **kwargs)
+            response = func(req_model.model)
             
-            # 记录响应内容
-            logs_tool.log_api_info(title="request_response_record",message=func.__name__,data=response)
 
             # 返回响应
             res_model = ResponseBaseModel(status=True
                                           ,code=HttpResponseCode.SUCCESS.value[0]
                                           ,message=HttpResponseCode.SUCCESS.value[1]
                                           ,data=response)
+            res_result = jsonpickle.encode(res_model)
+
+            # 记录响应内容
+            logs_tool.log_api_info(title="request_response_record",message=func.__name__,data=res_result)
             
-            return jsonify(res_model.to_dict())
+            return res_result
         except Exception as e:
-            # 记录错误内容
-            logs_tool.log_api_error(title="request_data_record",message=func.__name__,data=request.data,exc_info=e)
-            
             # 返回响应
             res_error = ResponseBaseModel(status=False
                                           ,code=HttpResponseCode.BAD_REQUEST.value[0]
                                           ,message=HttpResponseCode.BAD_REQUEST.value[1]
                                           ,data=e)
-            
-            return jsonify(res_error.to_dict())
+            res_result = jsonpickle.encode(res_error)
+
+            # 记录错误内容
+            logs_tool.log_api_error(title="request_data_record",message=func.__name__,data=res_result,exc_info=e)
+
+            return res_result
     return wrapper
+
+def request_base_model_builder(model:any) -> RequestBaseModel:
+    return RequestBaseModel(header=get_current_header(),model=model)
+
+def request_base_model_json_builder(model:any) -> str:
+    return jsonpickle.encode(request_base_model_builder(model))
+
+def get_request_base_model(json_str:str) -> RequestBaseModel:
+    return jsonpickle.decode(json_str)
+
+def get_request_base_model_data(json_str:str) -> any:
+    return get_request_base_model(json_str).model

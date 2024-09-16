@@ -2,6 +2,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 import json
 import os
+import jsonpickle
 
 # 创建日志目录
 log_dir = "logs"
@@ -62,45 +63,45 @@ api_logger = setup_logger('api_logger', api_log_file)
 
 # 基础日志记录函数
 def log_message(logger, level, log_type, title, message, data=None, exc_info=None):
-    logger.log(level, message, extra={'log_type': log_type, 'title': title, 'data': data}, exc_info=exc_info)
+    logger.log(level, message, extra={'log_type': log_type, 'title': title, 'data': jsonpickle.encode(data)}, exc_info=exc_info)
 
 # 数据库日志
 def log_db_info(title, message, data=None):
-    db_logger.log(logging.INFO, message, extra={'log_type': 'Database', 'title': title, 'data': data}, exc_info=None)
+    db_logger.log(logging.INFO, message, extra={'log_type': 'Database', 'title': title, 'data': jsonpickle.encode(data)}, exc_info=None)
 
 def log_db_warn(title, message, data=None, exc_info=None):
-    db_logger.log(logging.WARNING, message, extra={'log_type': 'Database', 'title': title, 'data': data}, exc_info=exc_info)
+    db_logger.log(logging.WARNING, message, extra={'log_type': 'Database', 'title': title, 'data': jsonpickle.encode(data)}, exc_info=exc_info)
 
 def log_db_error(title, message, data=None, exc_info=None):
-    db_logger.log(logging.ERROR, message, extra={'log_type': 'Database', 'title': title, 'data': data}, exc_info=exc_info)
+    db_logger.log(logging.ERROR, message, extra={'log_type': 'Database', 'title': title, 'data': jsonpickle.encode(data)}, exc_info=exc_info)
 
 
 # 业务日志
 def log_business_info(title, message, data=None):
-    business_logger.log(logging.INFO, message, extra={'log_type': 'Business', 'title': title, 'data': data}, exc_info=None)
+    business_logger.log(logging.INFO, message, extra={'log_type': 'Business', 'title': title, 'data': jsonpickle.encode(data)}, exc_info=None)
 
 def log_business_warn(title, message, data=None, exc_info=None):
-    business_logger.log(logging.WARNING, message, extra={'log_type': 'Business', 'title': title, 'data': data}, exc_info=exc_info)
+    business_logger.log(logging.WARNING, message, extra={'log_type': 'Business', 'title': title, 'data': jsonpickle.encode(data)}, exc_info=exc_info)
 
 def log_business_error(title, message, data=None, exc_info=None):
-    business_logger.log(logging.ERROR, message, extra={'log_type': 'Business', 'title': title, 'data': data}, exc_info=exc_info)
+    business_logger.log(logging.ERROR, message, extra={'log_type': 'Business', 'title': title, 'data': jsonpickle.encode(data)}, exc_info=exc_info)
 
 # 脚本日志
 def log_script_info(title, message, data=None):
-    script_logger.log(logging.INFO, message, extra={'log_type': 'Script', 'title': title, 'data': data}, exc_info=None)
+    script_logger.log(logging.INFO, message, extra={'log_type': 'Script', 'title': title, 'data': jsonpickle.encode(data)}, exc_info=None)
 
 def log_script_warn(title, message, data=None, exc_info=None):
-    script_logger.log(logging.WARNING, message, extra={'log_type': 'Script', 'title': title, 'data': data}, exc_info=exc_info)
+    script_logger.log(logging.WARNING, message, extra={'log_type': 'Script', 'title': title, 'data': jsonpickle.encode(data)}, exc_info=exc_info)
 
 def log_script_error(title, message, data=None, exc_info=None):
-    script_logger.log(logging.ERROR, message, extra={'log_type': 'Script', 'title': title, 'data': data}, exc_info=exc_info)
+    script_logger.log(logging.ERROR, message, extra={'log_type': 'Script', 'title': title, 'data': jsonpickle.encode(data)}, exc_info=exc_info)
 
 # 接口日志
 def log_api_info(title, message, data=None):
-    api_logger.log(logging.INFO, message, extra={'log_type': 'Api', 'title': title, 'data': data}, exc_info=None)
+    api_logger.log(logging.INFO, message, extra={'log_type': 'Api', 'title': title, 'data': jsonpickle.encode(data)}, exc_info=None)
 
 def log_api_error(title, message, data=None, exc_info=None):
-    api_logger.log(logging.ERROR, message, extra={'log_type': 'Api', 'title': title, 'data': data}, exc_info=exc_info)
+    api_logger.log(logging.ERROR, message, extra={'log_type': 'Api', 'title': title, 'data': jsonpickle.encode(data)}, exc_info=exc_info)
 
 
 # 使用日志记录器

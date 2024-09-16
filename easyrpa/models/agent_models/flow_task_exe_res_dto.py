@@ -8,7 +8,8 @@ class FlowTaskExeResDTO:
                  ,status:bool
                  ,error_msg:str
                  ,print_str:List[str]
-                 ,result:str):
+                 ,result:str
+                 ,code:str):
         self.task_id = task_id
         self.site_id = site_id
         self.flow_id = flow_id
@@ -21,6 +22,7 @@ class FlowTaskExeResDTO:
         self.error_msg = error_msg
         self.print_str = print_str
         self.result = result
+        self.code = code
         
     def to_dict(self):
         return self.__dict__
