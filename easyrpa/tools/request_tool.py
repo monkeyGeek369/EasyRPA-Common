@@ -106,7 +106,7 @@ def easyrpa_request_wrapper(func):
             res_result = jsonpickle.encode(res_error)
 
             # 记录错误内容
-            logs_tool.log_api_error(title="request_data_record",message=func.__name__,data=res_result,exc_info=e)
+            logs_tool.log_api_error(title="request_error_record",message=func.__name__,data=res_result,exc_info=e)
 
             return res_result
     return wrapper
