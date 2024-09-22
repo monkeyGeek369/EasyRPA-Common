@@ -14,6 +14,8 @@ def subprocess_script_run(env_activate_command:str, python_interpreter:str
                           ,script:str,dict_args:dict) -> ScriptExeResult:
     """
     激活环境后,使用指定的Python解释器执行外部Python脚本,并传递参数。
+    注意事项：
+    1、脚本执行结果通过print输出流获取，因此脚本中的输出内容编码必须为UTF-8（后端从输出流中解析使用utf-8），暂不支持指定其他编码。
 
     :param env_activate_command: 环境激活指令
     :param python_interpreter: 要使用的Python解释器的名称,如 'python'/'python3'。
@@ -56,23 +58,26 @@ def subprocess_script_run(env_activate_command:str, python_interpreter:str
             stdout=subprocess.PIPE,  # 创建一个管道来捕获输出
             stderr=subprocess.PIPE,  # 创建一个管道来捕获错误
             shell=True,        # 需要开启shell以执行conda激活命令
-            text=True           # 输出为文本格式,否则为字节方式输出
+            text=False           # true输出为文本格式,否则为字节方式输出
         )
         
-        # 获取失败信息
-        if result.stderr is not None and str_tools.str_is_not_empty(result.stderr):
-            return ScriptExeResult(False,"script exe error:" + result.stderr,None,None,RpaExeResultCodeEnum.FLOW_EXE_ERROR.value[1])
+        # 获取保准异常输出流
+        derr = None
+        if result.stderr is not None:
+            derr = result.stderr.decode('utf-8')
 
         # 获取标准输出流
         print_list = None
-        if result.stdout is not None and str_tools.str_is_not_empty(result.stdout):   
-            print_list = result.stdout.splitlines(keepends=False)
+        if result.stdout is not None:   
+            stdout = result.stdout.decode('utf-8')
+            if str_tools.str_is_not_empty(stdout):
+                print_list = stdout.splitlines(keepends=False)
         
         # 执行结果返回
         if print_list is None or len(print_list) < 0:
-            return ScriptExeResult(True,"script exe result is empty",print_list,None,RpaExeResultCodeEnum.FLOW_EXE_DATA_ERROR.value[1])
+            return ScriptExeResult(True,derr,print_list,None,RpaExeResultCodeEnum.FLOW_EXE_DATA_ERROR.value[1])
         else:
-            return ScriptExeResult(True,"script exe success",print_list[:-1],print_list[-1],RpaExeResultCodeEnum.SUCCESS.value[1])
+            return ScriptExeResult(True,derr,print_list[:-1],print_list[-1],RpaExeResultCodeEnum.SUCCESS.value[1])
     except subprocess.CalledProcessError as cpe:
         return ScriptExeResult(False,cpe.stderr,None,None,RpaExeResultCodeEnum.SYSTEM_OPT_ERROR.value[1])
     except EasyRpaException as easye:
