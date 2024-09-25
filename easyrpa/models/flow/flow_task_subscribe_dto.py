@@ -7,3 +7,4 @@ class FlowTaskSubscribeDTO:
     biz_no:str
     sub_source:int
     request_standard_message:str
+    flow_code:str

@@ -15,6 +15,7 @@ class EasyRpaExceptionCodeEnum(Enum):
     SYSTEM_TIMEOUT = ('SystemTimeout', 103, '系统超时')
     SYSTEM_NOT_FOUND = ('SystemNotFound', 104, '系统未找到')
     SYSTEM_NOT_CONFIG = ('SystemNotConfig', 105, '系统未配置')
+    SYSTEM_NOT_IMPLEMENT = ('SystemNotImplement', 106, '功能未实现')
     
     '''执行异常(201-300)'''
     EXECUTE_ERROR = ('ExecuteError', 201, '执行异常')
