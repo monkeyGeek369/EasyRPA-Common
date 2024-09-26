@@ -35,10 +35,10 @@ class Blake3Tool:
         return blake3.blake3(data, hash_value=hash_value).digest()
 
 # 示例使用
-tool = Blake3Tool(salt='my_salt', key='my_key')
-data = 'Hello, World!'
-hash_value = tool.hash(data)
-print(hash_value)
+#tool = Blake3Tool(salt='my_salt', key='my_key')
+#data = 'Hello, World!'
+#hash_value = tool.hash(data)
+#print(hash_value)
 
 # tool.verify(data, hash_value)
 
