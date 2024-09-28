@@ -13,12 +13,12 @@ class APSchedulerTool:
                  jobstores=None):
         if cls._instance is None:
             cls._instance = super(APSchedulerTool, cls).__new__(cls)
-            cls._instance.scheduler = cls._create_scheduler(scheduler_type)
+            cls._instance.scheduler = cls._instance._create_scheduler(scheduler_type=scheduler_type)
             cls._instance.scheduler.configure(
-                executors=executors or cls._default_executors(),
-                job_defaults=job_defaults or cls._default_job_defaults(),
+                executors=executors or cls._instance._default_executors(),
+                job_defaults=job_defaults or cls._instance._default_job_defaults(),
                 timezone=timezone,
-                jobstores=jobstores or cls._default_jobstores()
+                jobstores=jobstores or cls._instance._default_jobstores()
             )
         return cls._instance
 
