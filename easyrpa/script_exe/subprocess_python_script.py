@@ -1,6 +1,6 @@
 from operator import truediv
 import subprocess
-from easyrpa.tools import str_tools
+from easyrpa.tools import str_tools,logs_tool
 from easyrpa.models.easy_rpa_exception import EasyRpaException
 from easyrpa.models.scripty_exe_result import ScriptExeResult
 from easyrpa.enums.easy_rpa_exception_code_enum import EasyRpaExceptionCodeEnum
@@ -79,10 +79,13 @@ def subprocess_script_run(env_activate_command:str, python_interpreter:str
         else:
             return ScriptExeResult(True,derr,print_list[:-1],print_list[-1],RpaExeResultCodeEnum.SUCCESS.value[1])
     except subprocess.CalledProcessError as cpe:
+        logs_tool.log_script_error(title="subprocess_script_run",message="script run error",data=script,exc_info=cpe)
         return ScriptExeResult(False,cpe.stderr,None,None,RpaExeResultCodeEnum.SYSTEM_OPT_ERROR.value[1])
     except EasyRpaException as easye:
+        logs_tool.log_script_error(title="subprocess_script_run",message="script run error",data=script,exc_info=easye)
         return ScriptExeResult(False,str(easye),None,None,RpaExeResultCodeEnum.FLOW_EXE_ERROR.value[1])
     except Exception as e:
+        logs_tool.log_script_error(title="subprocess_script_run",message="script run error",data=script,exc_info=e)
         return ScriptExeResult(False,str(e),None,None,RpaExeResultCodeEnum.FLOW_EXE_ERROR.value[1])
     finally:
         # 删除临时文件
