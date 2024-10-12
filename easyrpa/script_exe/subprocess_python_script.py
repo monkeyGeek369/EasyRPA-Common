@@ -58,18 +58,19 @@ def subprocess_script_run(env_activate_command:str, python_interpreter:str
             stdout=subprocess.PIPE,  # 创建一个管道来捕获输出
             stderr=subprocess.PIPE,  # 创建一个管道来捕获错误
             shell=True,        # 需要开启shell以执行conda激活命令
-            text=False           # true输出为文本格式,否则为字节方式输出
+            text=True,           # true输出为文本格式,否则为字节方式输出
+            encoding='utf-8',    # 设置输出编码
         )
         
         # 获取保准异常输出流
         derr = None
-        if result.stderr is not None:
-            derr = result.stderr.decode('utf-8')
+        if str_tools.str_is_not_empty(result.stderr):
+            derr = result.stderr
 
         # 获取标准输出流
         print_list = None
-        if result.stdout is not None:   
-            stdout = result.stdout.decode('utf-8')
+        if str_tools.str_is_not_empty(result.stdout):   
+            stdout = result.stdout
             if str_tools.str_is_not_empty(stdout):
                 print_list = stdout.splitlines(keepends=False)
         
