@@ -51,16 +51,28 @@ def subprocess_script_run(env_activate_command:str, python_interpreter:str
         for key, value in dict_args.items():
             env_vars[key] = value
 
-        # 使用subprocess.run执行命令，捕获输出
-        result = subprocess.run(
-            command,
-            env= env_vars, # 将外部脚本参数当作子流程变量传递,避免并发问题.注意字典的key和value必须是str,否则会有类型错误
-            stdout=subprocess.PIPE,  # 创建一个管道来捕获输出
-            stderr=subprocess.PIPE,  # 创建一个管道来捕获错误
-            shell=True,        # 需要开启shell以执行conda激活命令
-            text=True,           # true输出为文本格式,否则为字节方式输出
-            encoding='utf-8',    # 设置输出编码
-        )
+        result = None
+        if platform.system() == "Windows":
+            # 使用subprocess.run执行命令，捕获输出
+            result = subprocess.run(
+                command,
+                env= env_vars, # 将外部脚本参数当作子流程变量传递,避免并发问题.注意字典的key和value必须是str,否则会有类型错误
+                stdout=subprocess.PIPE,  # 创建一个管道来捕获输出
+                stderr=subprocess.PIPE,  # 创建一个管道来捕获错误
+                shell=True,        # 需要开启shell以执行conda激活命令
+                text=True,           # true输出为文本格式,否则为字节方式输出
+                encoding='utf-8',    # 设置输出编码
+            )
+        else:
+            result = subprocess.run(
+                ["/bin/bash", "-c", command],
+                env= env_vars, # 将外部脚本参数当作子流程变量传递,避免并发问题.注意字典的key和value必须是str,否则会有类型错误
+                stdout=subprocess.PIPE,  # 创建一个管道来捕获输出
+                stderr=subprocess.PIPE,  # 创建一个管道来捕获错误
+                shell=False,        # 需要开启shell以执行conda激活命令
+                text=True,           # true输出为文本格式,否则为字节方式输出
+                encoding='utf-8',    # 设置输出编码
+            )
         
         # 获取保准异常输出流
         derr = None
@@ -127,8 +139,6 @@ def env_activate_command_builder(flow_exe_env:str) -> str:
     env_activate_command = None
     if platform.system() == "Windows":
         env_activate_command = f'conda activate {flow_exe_env}'
-    elif platform.system() == "Darwin":
-        env_activate_command = f'source activate {flow_exe_env}'
     elif platform.system() == "Linux":
         env_activate_command = f'source activate {flow_exe_env}'
     else:
