@@ -73,8 +73,21 @@ def easyrpa_request_wrapper(func):
             # 记录请求内容
             logs_tool.log_api_info(title="request_data_record",message=func.__name__,data=request.get_json())
 
-            # 获取请求header
-            req_model = get_request_base_model(request.get_json())
+            # 获取请求model
+            origin_model = request.get_json()
+            if origin_model is None:
+                raise EasyRpaException("request model is null",EasyRpaExceptionCodeEnum.DATA_NULL.value[1],None,origin_model)
+            
+            req_model = None
+            if isinstance(origin_model,dict):
+                header = RequestHeader(**origin_model['header'])
+                req_model = RequestBaseModel(header=header, model=origin_model['model'])
+            elif isinstance(origin_model,str):
+                req_model = get_request_base_model(origin_model)
+            else:
+                raise EasyRpaException("request model type error",EasyRpaExceptionCodeEnum.DATA_TYPE_ERROR.value[1],None,origin_model)
+
+            # 获取header
             req_header = req_model.header
             if req_header is None:
                 raise EasyRpaException("request header is null",EasyRpaExceptionCodeEnum.DATA_NULL.value[1],None,req_model)
@@ -85,7 +98,6 @@ def easyrpa_request_wrapper(func):
             # 调用原始视图函数
             response = func(req_model.model)
             
-
             # 返回响应
             res_model = ResponseBaseModel(status=True
                                           ,code=HttpResponseCode.SUCCESS.value[0]
