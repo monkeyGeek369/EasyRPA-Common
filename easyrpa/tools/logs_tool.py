@@ -3,6 +3,10 @@ from logging.handlers import RotatingFileHandler
 import json
 import os
 import jsonpickle
+import sys
+import threading
+from easyrpa.enums.easy_rpa_exception_code_enum import EasyRpaExceptionCodeEnum
+from easyrpa.models.easy_rpa_exception import EasyRpaException
 
 # 创建日志目录
 log_dir = "logs"
@@ -104,6 +108,35 @@ def log_api_error(title, message, data=None, exc_info=None):
     api_logger.log(logging.ERROR, message, extra={'log_type': 'Api', 'title': title, 'data': jsonpickle.encode(data)}, exc_info=exc_info)
 
 
+# 全局异常捕获
+def global_except_hook(exc_type, exc_value, exc_traceback):
+    # 处理异常逻辑
+    log_business_error(title="global_except_hook",message=str(exc_type),data=str(exc_value),exc_info=exc_traceback)
+
+def thread_except_hook(args):
+    # 处理异常逻辑
+    log_business_error(title="thread_except_hook",message="thread",data=None,exc_info=args)
+
+sys.excepthook = global_except_hook
+threading.excepthook = thread_except_hook
+
+# def throw_exception():
+#     # 在线程中引发异常
+#     raise Exception('not support jobstore:',{"key111":"value111","key222":222})
+
+# def test_thread_except_hook():
+#     # 创建一个新的线程
+#     thread = threading.Thread(target=throw_exception)
+
+#     # 设置线程异常捕获机制
+#     threading.excepthook = thread_except_hook
+
+#     # 启动线程
+#     thread.start()
+
+#     # 等待线程结束
+#     thread.join()
+
 # 使用日志记录器
 if __name__ == "__main__":
     # 业务日志
@@ -116,6 +149,12 @@ if __name__ == "__main__":
 
     # 脚本日志
     #log_message(script_logger, logging.WARNING, 'Script', 'Script Warning', 'This is a script warning message',{"key111":"value111","key222":222})
+
+    # 全局异常
+    #raise EasyRpaException('not support jobstore:',EasyRpaExceptionCodeEnum.DATA_TYPE_ERROR.value[1],{"key111":"value111","key222":222})
+    #raise Exception('not support jobstore:',{"key111":"value111","key222":222})
+    #test_thread_except_hook()
+
 
     # 异常日志
     try:
