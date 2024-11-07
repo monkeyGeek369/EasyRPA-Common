@@ -24,6 +24,24 @@ class JsonTool:
         cls = type(obj)
         module = inspect.getmodule(cls)
         return module is not None and module.__name__ != 'builtins'
+
+    @staticmethod
+    def any_to_dict(obj) -> dict:
+        if dataclasses.is_dataclass(obj):
+            return dataclasses.asdict(obj)
+        elif hasattr(obj, '__dict__'):
+            return obj.__dict__
+        elif isinstance(obj, (list, tuple)):
+            result = []
+            for item in obj:
+                result.append(JsonTool.any_to_dict(item))
+            return result
+        elif isinstance(obj, dict):
+            return {key: JsonTool.any_to_dict(value) if isinstance(value, (dict, list, tuple)) else value for key, value in obj.items()}
+        elif hasattr(obj, '__slots__'):
+            return {slot: getattr(obj, slot) for slot in obj.__slots__}
+        else:
+            return obj
         
     @staticmethod
     def obj_to_json(obj) -> str:
@@ -33,7 +51,11 @@ class JsonTool:
             raise EasyRpaException("param is not custom class object",EasyRpaExceptionCodeEnum.DATA_TYPE_ERROR,None,obj)
         if isinstance(obj, list):
             raise EasyRpaException("param is list type,not support",EasyRpaExceptionCodeEnum.DATA_TYPE_ERROR,None,obj)
-        obj_dict = dataclasses.asdict(obj)
+        
+        obj_dict = JsonTool.any_to_dict(obj)
+        if obj_dict is None:
+            raise EasyRpaException("obj to dict error",EasyRpaExceptionCodeEnum.DATA_TYPE_ERROR,None,obj)
+        
         return json.dumps(obj_dict, default=JsonTool.serialize_object)
     
     @staticmethod
@@ -45,13 +67,22 @@ class JsonTool:
         
         temp_objs = []
         for obj in objs:
+            if obj is None:
+                continue
             if not JsonTool.is_custom_class_instance(obj):
                 raise EasyRpaException("list obj is not custom class object",EasyRpaExceptionCodeEnum.DATA_TYPE_ERROR,None,obj)
             if obj is not None:
                 temp_objs.append(obj)
         
-        return json.dumps([dataclasses.asdict(item) for item in temp_objs],default=JsonTool.serialize_object)
+        if len(temp_objs) == 0:
+            return None
+        to_dict = JsonTool.any_to_dict(temp_objs)
+        return json.dumps(to_dict,default=JsonTool.serialize_object)
     
+    @staticmethod
+    def any_to_json(obj) -> str:
+        to_dict = JsonTool.any_to_dict(obj)
+        return json.dumps(to_dict,default=JsonTool.serialize_object)
     
 if __name__ == "__main__":
     header = RequestHeader(
@@ -84,9 +115,22 @@ if __name__ == "__main__":
         sub_source = 6
     )
 
+    test_dict = {
+        "a": 1,
+        "b": 2,
+        "c": [{
+            "d": "123"
+        },
+        {
+            "e": False
+        }]
+    }
+
     # obj to json
-    json_str = JsonTool.obj_to_json(obj=obj)
-    print(json_str)
+    #json_str = JsonTool.obj_to_json(obj=obj)
+    #print(json_str)
+    #json_str = JsonTool.obj_to_json(obj=flow_task)
+    #print(json_str)
     #json_str = JsonTool.obj_to_json(obj=objs)
     #print(json_str)
     #json_str = JsonTool.obj_to_json(obj=None)
@@ -95,14 +139,49 @@ if __name__ == "__main__":
     #print(json_str)
     #json_str = JsonTool.obj_to_json(obj=False)
     #print(json_str)
-    json_str = JsonTool.obj_to_json(obj=flow_task)
-    print(json_str)
+    #json_str = JsonTool.obj_to_json(obj=123)
+    #print(json_str)
+
+    # any to dict
+    #dict_ret = JsonTool.any_to_dict(obj=obj)
+    #print(dict_ret)
+    #dict_ret = JsonTool.any_to_dict(obj=flow_task)
+    #print(dict_ret)
+    #dict_ret = JsonTool.any_to_dict(obj=objs)
+    #print(dict_ret)
+    #dict_ret = JsonTool.any_to_dict(obj=test_dict)
+    #print(dict_ret)
+    #dict_ret = JsonTool.any_to_dict(obj=None)
+    #print(dict_ret)
+    #dict_ret = JsonTool.any_to_dict(obj="test")
+    #print(dict_ret)
+    #dict_ret = JsonTool.any_to_dict(obj=False)
+    #print(dict_ret)
+    #dict_ret = JsonTool.any_to_dict(obj=123)
+    #print(dict_ret)
 
     # objs to json
-    json_str = JsonTool.objs_to_json(objs=objs)
-    print(json_str)
-
-    # dict to json
+    #dict_ret = JsonTool.objs_to_json(objs=obj)
+    #print(dict_ret)
+    #dict_ret = JsonTool.objs_to_json(objs=flow_task)
+    #print(dict_ret)
+    #dict_ret = JsonTool.objs_to_json(objs=objs)
+    #print(dict_ret)
 
     # any to json
-
+    #json_str = JsonTool.any_to_json(obj=obj)
+    #print(json_str)
+    #json_str = JsonTool.any_to_json(obj=flow_task)
+    #print(json_str)
+    #json_str = JsonTool.any_to_json(obj=objs)
+    #print(json_str)
+    #json_str = JsonTool.any_to_json(obj=test_dict)
+    #print(json_str)
+    #json_str = JsonTool.any_to_json(obj=None)
+    #print(json_str)
+    #json_str = JsonTool.any_to_json(obj="test")
+    #print(json_str)
+    #json_str = JsonTool.any_to_json(obj=False)
+    #print(json_str)
+    #json_str = JsonTool.any_to_json(obj=123)
+    #print(json_str)
