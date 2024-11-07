@@ -1,6 +1,8 @@
 import json
 import dataclasses
 import inspect
+import re
+import jsonpickle
 from datetime import datetime
 from easyrpa.models.base.script_exe_param_model import ScriptExeParamModel
 from easyrpa.models.base.request_header import RequestHeader
@@ -84,6 +86,10 @@ class JsonTool:
         to_dict = JsonTool.any_to_dict(obj)
         return json.dumps(to_dict,default=JsonTool.serialize_object)
     
+    @staticmethod
+    def json_to_obj(json_str: str, obj_class: any) -> any:
+        return jsonpickle.decode(json_str, classes=obj_class)
+    
 if __name__ == "__main__":
     header = RequestHeader(
         user_id=1,
@@ -125,6 +131,18 @@ if __name__ == "__main__":
             "e": False
         }]
     }
+
+    # json to obj
+    json_str = JsonTool.any_to_json(obj=header)
+    obj_result = JsonTool.json_to_obj(json_str,RequestHeader)
+    print(obj_result)
+    #json_str = JsonTool.any_to_json(obj=obj)
+    #obj_result = JsonTool.json_to_obj(json_str,ScriptExeParamModel)
+    #print(obj_result)
+    #json_str = JsonTool.any_to_json(obj=flow_task)
+    #obj_result = JsonTool.json_to_obj(json_str,FlowTaskExeReqDTO)
+    #print(obj_result)
+    # 还要测试存在继承关系的类如何json转对象
 
     # obj to json
     #json_str = JsonTool.obj_to_json(obj=obj)
