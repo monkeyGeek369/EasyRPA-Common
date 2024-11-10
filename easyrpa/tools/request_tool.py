@@ -2,14 +2,15 @@ from easyrpa.models.base.request_header import RequestHeader
 from easyrpa.tools import thread_local
 import uuid
 from datetime import datetime
-import functools,jsonpickle
 from easyrpa.tools import logs_tool
-from flask import request,jsonify
+import functools
+from flask import request
 from easyrpa.enums.http_response_code_enum import HttpResponseCode
 from easyrpa.models.base.response_base_model import ResponseBaseModel
 from easyrpa.models.base.request_base_model import RequestBaseModel
 from easyrpa.models.easy_rpa_exception import EasyRpaException
 from easyrpa.enums.easy_rpa_exception_code_enum import EasyRpaExceptionCodeEnum
+from easyrpa.tools.json_tools import JsonTool
 
 # 
 def get_parameter(request, param, default, cast_type):
@@ -103,7 +104,7 @@ def easyrpa_request_wrapper(func):
                                           ,code=HttpResponseCode.SUCCESS.value[0]
                                           ,message=HttpResponseCode.SUCCESS.value[1]
                                           ,data=response)
-            res_result = jsonpickle.encode(res_model)
+            res_result = JsonTool.any_to_dict(res_model)
 
             # 记录响应内容
             logs_tool.log_api_info(title="request_response_record",message=func.__name__,data=res_result)
@@ -114,8 +115,9 @@ def easyrpa_request_wrapper(func):
             res_error = ResponseBaseModel(status=False
                                           ,code=HttpResponseCode.BAD_REQUEST.value[0]
                                           ,message=HttpResponseCode.BAD_REQUEST.value[1]
-                                          ,data=e)
-            res_result = jsonpickle.encode(res_error)
+                                          ,data=e.__dict__ if hasattr(e,'__dict__') and len(e.__dict__)>0 else e.args
+                                          )
+            res_result = JsonTool.any_to_dict(res_error)
 
             # 记录错误内容
             logs_tool.log_api_error(title="request_error_record",message=func.__name__,data=res_result,exc_info=e)
@@ -127,10 +129,17 @@ def request_base_model_builder(model:any) -> RequestBaseModel:
     return RequestBaseModel(header=get_current_header(),model=model)
 
 def request_base_model_json_builder(model:any) -> str:
-    return jsonpickle.encode(request_base_model_builder(model))
+    return JsonTool.any_to_json(request_base_model_builder(model))
 
 def get_request_base_model(json_str:str) -> RequestBaseModel:
-    return jsonpickle.decode(json_str)
+    dict_dto = JsonTool.any_to_dict(json_str)
+    
+    ret = RequestBaseModel(
+        header=RequestHeader(**dict_dto.get('header')),
+        model=dict_dto.get('model')
+    )
+
+    return ret
 
 def get_request_base_model_data(json_str:str) -> any:
     return get_request_base_model(json_str).model

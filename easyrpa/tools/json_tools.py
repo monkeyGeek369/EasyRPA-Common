@@ -9,11 +9,16 @@ from easyrpa.models.easy_rpa_exception import EasyRpaException
 from easyrpa.enums.easy_rpa_exception_code_enum import EasyRpaExceptionCodeEnum
 
 class JsonTool:
-
     @staticmethod
     def serialize_object(obj):
         if isinstance(obj, datetime):
             return obj.isoformat()
+        elif isinstance(obj, dict):
+            return {key: JsonTool.serialize_object(value) for key, value in obj.items()}
+        elif isinstance(obj, (list, tuple)):
+            return [JsonTool.serialize_object(item) for item in obj]
+        elif hasattr(obj, '__dict__'):
+            return JsonTool.serialize_object(obj)
         elif callable(obj):
             return obj.__name__
         else:
@@ -30,7 +35,7 @@ class JsonTool:
         if dataclasses.is_dataclass(obj):
             return dataclasses.asdict(obj)
         elif hasattr(obj, '__dict__'):
-            return obj.__dict__
+            return {key: value for key, value in obj.__dict__.items() if not key.startswith('_') and not key.endswith('_')}
         elif isinstance(obj, (list, tuple)):
             result = []
             for item in obj:
@@ -40,6 +45,15 @@ class JsonTool:
             return {key: JsonTool.any_to_dict(value) if isinstance(value, (dict, list, tuple)) else value for key, value in obj.items()}
         elif hasattr(obj, '__slots__'):
             return {slot: getattr(obj, slot) for slot in obj.__slots__}
+        elif callable(obj):
+            return obj.__name__
+        elif isinstance(obj, datetime):
+            return obj.isoformat()
+        elif isinstance(obj,str):
+            try:
+                return json.loads(obj)
+            except:
+                return obj
         else:
             return obj
         
