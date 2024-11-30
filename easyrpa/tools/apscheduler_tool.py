@@ -58,24 +58,68 @@ class APSchedulerTool:
     def shutdown(self):
         self.scheduler.shutdown(wait=False)
 
+    def get_all_jobs(self):
+        return self.scheduler.get_jobs()
+    
+    def get_job(self, job_id):
+        return self.scheduler.get_job(job_id)
+    
+    def delete_job(self, job_id):
+        self.scheduler.remove_job(job_id)
+
     def __del__(self):
         self.shutdown()
 
 
+if __name__ == '__main__':
+    '''
+    scheduler_tool = APSchedulerTool(
+        scheduler_type='background',
+        executors={
+            'default': ThreadPoolExecutor(max_workers=10),
+            'processpool': ProcessPoolExecutor(max_workers=5)
+        },
+        job_defaults={
+            'coalesce': False,
+            'max_instances': 3,
+            'misfire_grace_time': 30
+        },
+        timezone='Asia/Shanghai',
+        jobstores={
+            'default': MemoryJobStore()
+        }
+    )
 
-# scheduler_tool = APSchedulerTool(
-#     scheduler_type='background',
-#     executors={
-#         'default': ThreadPoolExecutor(max_workers=10),
-#         'processpool': ProcessPoolExecutor(max_workers=5)
-#     },
-#     job_defaults={
-#         'coalesce': False,
-#         'max_instances': 3,
-#         'misfire_grace_time': 30
-#     },
-#     timezone='Asia/Shanghai',
-#     jobstores={
-#         'default': MemoryJobStore()
-#     }
-# )
+    # add test
+    scheduler_tool.add_job(func=print,
+                      trigger='cron',
+                      second=1,
+                      minute=1,
+                      hour=1,
+                      day=1,
+                      month=1,
+                      day_of_week=1,
+                      kwargs={'job_id':123})
+    scheduler_tool.add_job(func=print,
+                      trigger='cron',
+                      second=1,
+                      minute=1,
+                      hour=1,
+                      day=1,
+                      month=1,
+                      day_of_week=1,
+                      kwargs={'job_id':456})
+    # get all jobs
+    #all_jobs = scheduler_tool.get_all_jobs()
+    # all_jobs[0].kwargs.get('job_id')
+    # all_jobs[0].name
+    #print(all_jobs)
+
+    # get job by id
+    #job = scheduler_tool.get_job(job_id="786381a7c0bb4a1ca9fbec4d75bdd79e")
+    #print(job)
+
+    # delete job
+    #scheduler_tool.delete_job(job_id='e5ceb767e51044eea95026858452c73c')
+    #print(scheduler_tool.get_all_jobs())
+    '''
