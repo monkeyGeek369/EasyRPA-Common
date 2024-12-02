@@ -23,7 +23,7 @@ def get_machine_disk_id() -> str:
         result = subprocess.check_output('lsblk -o SERIAL', shell=True)
         result = result.decode().split('\n')[1].strip()
     elif os_type == "Darwin":  # macOS
-        result = subprocess.check_output('system_profiler SPSerialATADataType | grep "Serial Number"', shell=True)
+        result = subprocess.check_output('diskutil info /dev/disk0 | grep "Device / Media Name:"', shell=True)
         result = result.decode().split(':')[1].strip()
 
     if result is None:
@@ -76,22 +76,22 @@ def get_machine_id(salt:str,key:str,*args) -> str:
     return tool.hash(keys)
 
 if __name__ == '__main__':
-    #mac = get_machine_mac_id()
-    #print(mac)
+    mac = get_machine_mac_id()
+    print(mac)
 
-    #cpu_id = get_machine_cpu_id()
-    #print(cpu_id)
+    cpu_id = get_machine_cpu_id()
+    print(cpu_id)
 
-    #disk_id = get_machine_disk_id()
+    disk_id = get_machine_disk_id()
     # 8CE3_8E03_0094_8A52_0000_0000_0000_0000.
-    #print(disk_id)
+    print(disk_id)
 
-    #board_id = get_main_board_id()
+    board_id = get_main_board_id()
     # 240334518805292
-    #print(board_id)
+    print(board_id)
 
-    #ip_list = get_machine_ips()
-    #print(ip_list)
+    ip_list = get_machine_ips()
+    print(ip_list)
 
     pass
 
