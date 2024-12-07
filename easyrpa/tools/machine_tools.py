@@ -59,7 +59,7 @@ def get_machine_ips() -> list[str]:
         return None
     return [ip[4][0] for ip in ips]
 
-def get_machine_id(salt:str,key:str,*args) -> str:
+def get_machine_id(salt:str,key:str,args:list[str]) -> str:
     if args is None or len(args) == 0:
         return None
     
