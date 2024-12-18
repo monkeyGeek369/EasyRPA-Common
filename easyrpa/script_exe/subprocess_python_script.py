@@ -142,7 +142,7 @@ def env_activate_command_builder(flow_exe_env:str) -> str:
     elif platform.system() == "Linux":
         env_activate_command = f'source activate {flow_exe_env}'
     else:
-        raise EasyRpaException("operation sysytem is not support",EasyRpaExceptionCodeEnum.SYSTEM_NOT_FOUND,None,flow_exe_env)
+        raise EasyRpaException("operation system is not support",EasyRpaExceptionCodeEnum.SYSTEM_NOT_FOUND,None,flow_exe_env)
 
     return env_activate_command
     
