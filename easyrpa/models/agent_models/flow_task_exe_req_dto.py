@@ -12,3 +12,4 @@ class FlowTaskExeReqDTO:
     flow_standard_message:str
     flow_exe_script:str
     sub_source:int
+    max_exe_time:int
