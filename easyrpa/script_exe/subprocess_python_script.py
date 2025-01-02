@@ -88,7 +88,6 @@ def subprocess_script_run(env_activate_command:str, python_interpreter:str
             if str_tools.str_is_not_empty(stdout):
                 print_list = stdout.splitlines(keepends=False)
 
-        logs_tool.log_script_info(title="subprocess_script_run",message="print_list len",data=len(print_list))
         logs_tool.log_script_info(title="subprocess_script_run",message="print_list",data=print_list)
         
         # 执行结果返回
