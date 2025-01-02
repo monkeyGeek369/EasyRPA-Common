@@ -74,17 +74,22 @@ def subprocess_script_run(env_activate_command:str, python_interpreter:str
                 encoding='utf-8',    # 设置输出编码
             )
         
-        # 获取保准异常输出流
+        # 获取标准异常输出流
         derr = None
         if str_tools.str_is_not_empty(result.stderr):
             derr = result.stderr
+            logs_tool.log_script_info(title="subprocess_script_run",message="derr len",data=len(derr))
 
         # 获取标准输出流
         print_list = None
         if str_tools.str_is_not_empty(result.stdout):   
             stdout = result.stdout
+            logs_tool.log_script_info(title="subprocess_script_run",message="stdout len",data=len(stdout))
             if str_tools.str_is_not_empty(stdout):
                 print_list = stdout.splitlines(keepends=False)
+
+        logs_tool.log_script_info(title="subprocess_script_run",message="print_list len",data=len(print_list))
+        logs_tool.log_script_info(title="subprocess_script_run",message="print_list",data=print_list)
         
         # 执行结果返回
         if print_list is None or len(print_list) < 0:
@@ -92,17 +97,19 @@ def subprocess_script_run(env_activate_command:str, python_interpreter:str
         else:
             return ScriptExeResult(True,derr,print_list[:-1],print_list[-1],RpaExeResultCodeEnum.SUCCESS.value[1])
     except subprocess.CalledProcessError as cpe:
-        logs_tool.log_script_error(title="subprocess_script_run",message="script run error",data=script,exc_info=cpe)
+        logs_tool.log_script_error(title="subprocess_script_run",message="script run error",data=cpe.stderr,exc_info=None)
         return ScriptExeResult(False,cpe.stderr,None,None,RpaExeResultCodeEnum.SYSTEM_OPT_ERROR.value[1])
     except EasyRpaException as easye:
-        logs_tool.log_script_error(title="subprocess_script_run",message="script run error",data=script,exc_info=easye)
+        logs_tool.log_script_error(title="subprocess_script_run",message="script run error",data=dict_args,exc_info=easye)
         return ScriptExeResult(False,str(easye),None,None,RpaExeResultCodeEnum.FLOW_EXE_ERROR.value[1])
     except Exception as e:
-        logs_tool.log_script_error(title="subprocess_script_run",message="script run error",data=script,exc_info=e)
+        logs_tool.log_script_error(title="subprocess_script_run",message="script run error",data=dict_args,exc_info=e)
         return ScriptExeResult(False,str(e),None,None,RpaExeResultCodeEnum.FLOW_EXE_ERROR.value[1])
     finally:
-        # 删除临时文件
-        os.remove(filename)
+        try:
+            os.remove(filename)
+        except Exception as fe:
+            logs_tool.log_script_error(title="subprocess_script_run",message="remove file error",data=filename,exc_info=fe)
 
 def script_exe_param_builder(param:ScriptExeParamModel) -> dict:
     """
